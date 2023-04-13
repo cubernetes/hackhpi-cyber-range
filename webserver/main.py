@@ -13,6 +13,7 @@ from shutil import copyfile
 from werkzeug.middleware.shared_data import SharedDataMiddleware
 from oauthlib.oauth2 import WebApplicationClient
 from discord_webhook import DiscordWebhook, DiscordEmbed
+from base64 import b64decode
 
 app = Flask(__name__)
 
@@ -70,7 +71,7 @@ def login_general():
             
             if not matching_user_json == None:
                 if matching_user_json["password"] == password_login:
-                    var_user_to_login = User(matching_user_json["id"])
+                    var_user_to_login = User(matching_user_json["userid"])
                     login_user(var_user_to_login)
                     return redirect("/d1")
                 else:
@@ -107,20 +108,67 @@ def cpdashy_1_main():
         with open(f'database/users/{userid}/user.json','r') as f:
             user_data = json.load(f)
 
-        # Continue here -> log data reading
-        # start sim button
+        if not os.path.exists("database/temp/sim_running.txt"):
+            sim_running = "False"
+        else:
+            with open("database/temp/sim_running.txt","r") as f:
+                sim_running = f.read()
 
-        return render_template("main/dashboard_main1.html",sidebar_html_insert=cpdash_get_sidebar().replace("active_state_class1","is-active"), profile_picture=user_data["picture"],profile_username=user_data["username"],profile_userid=user_data["userid"],profile_email=user_data["email"])
+        if not os.path.exists("database/temp/sim_start.txt"):
+            sim_start_timestamp = "0"
+        else:
+            with open("database/temp/sim_start.txt","r") as f:
+                sim_start_timestamp_stamp = int(f.read().split(".")[0])
+            
+            sim_start_timestamp = str(round((time.time() - sim_start_timestamp_stamp) / 60,3))
+
+        with open("database/logs/blue.json","r") as f:
+            blue_logs_list_ori = json.load(f)
+        blue_logs_list = []
+        for blue_log_now in blue_logs_list_ori:
+            min, sec = divmod(time.time() - int(blue_log_now["timestamp"]),60)
+            blue_log_now["timestamp"] = str(int(min)) + "m&nbsp;" + str(int(round(sec,0))) + "s"
+            blue_logs_list.append(blue_log_now)
+
+        with open("database/logs/red.json","r") as f:
+            red_logs_list_ori = json.load(f)
+        red_logs_list = []
+        for red_log_now in red_logs_list_ori:
+            min, sec = divmod(time.time() - int(red_log_now["timestamp"]),60)
+            red_log_now["timestamp"] = str(int(min)) + "m&nbsp;" + str(int(round(sec,0))) + "s"
+            red_logs_list.append(red_log_now)
+
+
+        blue_logs_list.reverse()
+        red_logs_list.reverse()
+
+        return render_template("main/dashboard_main1.html",blue_logs_list=blue_logs_list,red_logs_list=red_logs_list,sim_running=sim_running,sim_start_timestamp=sim_start_timestamp,sidebar_html_insert=cpdash_get_sidebar().replace("active_state_class1","is-active"), profile_picture=user_data["picture"],profile_username=user_data["username"],profile_userid=user_data["userid"],profile_email=user_data["email"])
 
     else:
         return redirect('/login')
     
-@app.route("/d1/startsim", methods=['GET']) #start the sim
+@app.route("/d1/startsim", methods=['GET']) #start and stop the sim
 def cpdashy_startsim():
     if current_user.is_authenticated:
-        clear_session_full()
-        with open("database/temp/attack_start.txt","w") as f:
-            f.write(str(time.time()))
+        if os.path.exists("database/temp/sim_running.txt"):
+            with open("database/temp/sim_running.txt","r") as f:
+                current_state = f.read()
+            if not current_state == "False":
+                with open("database/temp/sim_running.txt","w") as f:
+                    f.write("False")
+            else:
+                clear_session_full()
+                with open("database/temp/sim_start.txt","w") as f:
+                    f.write(str(time.time()))
+                with open("database/temp/sim_running.txt","w") as f:
+                    f.write("True")
+            
+        else:
+            clear_session_full()
+            with open("database/temp/sim_start.txt","w") as f:
+                f.write(str(time.time()))
+            with open("database/temp/sim_running.txt","w") as f:
+                f.write("True")
         return redirect("/d1")
     else:
         return redirect('/login')
@@ -128,12 +176,15 @@ def cpdashy_startsim():
 
 # API
 def clear_session_full():
-    os.remove("database/temp/sim_start.txt")
-    os.remove("database/temp/attack_start.txt")
+    for file_now in ["database/temp/sim_start.txt","database/temp/attack_start.txt","database/temp/sim_running.txt","database/temp/attack_running.txt"]:
+        try:
+            os.remove(file_now)
+        except:
+            pass
     with open("database/logs/red.json","w") as f:
-        f.write("{}")
+        f.write("[]")
     with open("database/logs/blue.json","w") as f:
-        f.write("{}")
+        f.write("[]")
 
 @app.route("/api/red", methods=['POST'])
 def api_red_logs():
@@ -141,7 +192,7 @@ def api_red_logs():
     print("red log received")
     print(temp_json_n)
 
-    if temp_json_n["title"] == "Start of attack":
+    if temp_json_n["data"] == "Start of attack":
         with open("database/temp/attack_start.txt",'w') as f:
             f.write(str(temp_json_n["timestamp"]))
 
@@ -149,7 +200,24 @@ def api_red_logs():
         logs_list = json.load(f)
     logs_list.append(temp_json_n)
     with open("database/logs/red.json","w") as f:
-        json.dump(logs_list)
+        json.dump(logs_list,f)
+
+    return("log saved")
+
+
+@app.route("/api/blue", methods=['POST'])
+def api_blue_logs():
+    temp_json_n = request.json
+    temp_json_n["data"] = b64decode(temp_json_n["data"]).decode("utf-8").replace("\n","<br>")
+    print("blue log received")
+    print(temp_json_n)
+
+
+    with open("database/logs/blue.json","r") as f:
+        logs_list = json.load(f)
+    logs_list.append(temp_json_n)
+    with open("database/logs/blue.json","w") as f:
+        json.dump(logs_list,f)
 
     return("log saved")
 
@@ -164,6 +232,8 @@ def custom_401(error):
 @app.errorhandler(404)
 def custom_404(error):
     return redirect("/")
+
+clear_session_full()
 
 if __name__ == '__main__':
     app.run(host='185.78.255.231', threaded=True,use_reloader=True, port=443, ssl_context=('/etc/letsencrypt/live/network.kyudev.xyz/fullchain.pem', '/etc/letsencrypt/live/network.kyudev.xyz/privkey.pem'))

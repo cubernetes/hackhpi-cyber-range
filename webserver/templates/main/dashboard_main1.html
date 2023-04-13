@@ -8,6 +8,8 @@
     <meta name="title" content="CyberRange">
     <meta name="description" content="Teach and Test you employee about cyber attacks">
 
+    <!-- <meta http-equiv="refresh" content="3"> -->
+
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap");
 
@@ -38,8 +40,8 @@
         body {
             font-family: var(--body-font);
             color: var(--body-color);
-            background-image: url("https://wallpaperstock.net/planet-stars-mountains-field-wallpapers_44750_1920x1200.jpg?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1951&q=80");
-            background-image: url(https://wallpaperstock.net/planet-stars-mountains-field-wallpapers_44750_1920x1200.jpg?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1950&q=80);
+            /* background-image: url("https://wallpaperstock.net/planet-stars-mountains-field-wallpapers_44750_1920x1200.jpg?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1951&q=80"); */
+            /* background-image: url(https://wallpaperstock.net/planet-stars-mountains-field-wallpapers_44750_1920x1200.jpg?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1950&q=80); */
             background-position: center;
             background-size: cover;
             background-repeat: no-repeat;
@@ -351,10 +353,10 @@
             overflow: auto;
         }
 
-        .anim {
+        /* .anim {
             -webkit-animation: bottom 0.8s var(--delay) both;
             animation: bottom 0.8s var(--delay) both;
-        }
+        } */
 
         .main-header {
             font-size: 30px;
@@ -616,10 +618,6 @@
             transform: scale(0.6);
             right: -3px;
             z-index: 10;
-        }
-
-        .video:hover .video-by {
-            color: #c034dcb4;
         }
 
         .video-author {
@@ -1302,25 +1300,25 @@
                 <div class="main-header anim" style="--delay: 0.4s">General</div>
                 <div class="videos">
                     <div class="video anim" style="--delay: .4s">
-                        <a target="_blank" href="#" style="text-decoration: none;color: #ff66d9;">
+                        <a href="#" style="text-decoration: none;color: #ff66d9;">
                             <div class="video-by" title="Time elapsed since the Attack started">Time since Attack start</div>
                             <div class="video-name padding_stat_n">xxx</div>
                         </a>
                     </div>
                     <div class="video anim" style="--delay: .45s">
                         <a href="#" style="text-decoration: none;color: #ff66d9;">
-                            <div class="video-by" title="xxx">Time since Sim start</div>
-                            <div class="video-name padding_stat_n">xxx</div>
+                            <div class="video-by" title="Time since the sim started">Time since Sim start</div>
+                            <div class="video-name padding_stat_n" id="time_since_sim_start_min"></div>
                         </a>
                     </div>
                     <div class="video anim" style="--delay: .5s">
-                        <a target="_blank" href="/d1/startsim" style="text-decoration: none;color: #ff66d9;">
-                            <div class="video-by" title="Start the Simulation">Start Simulation</div>
+                        <a href="/d1/startsim" style="text-decoration: none;color: #ff66d9;">
+                            <div class="video-by" title="Start or Stop the Simulation" id="start_stop_sim_btn">Start Simulation</div>
                             <div class="video-name padding_stat_n">click here</div>
                         </a>
                     </div>
                     <div class="video anim" style="--delay: .55s">
-                        <a target="_blank" href="#" style="text-decoration: none;color: #ff66d9;">
+                        <a href="#" style="text-decoration: none;color: #ff66d9;">
                             <div class="video-by" title="xxx">Other</div>
                             <div class="video-name padding_stat_n">xxx</div>
                         </a>
@@ -1331,9 +1329,56 @@
 
                 <div class="main-header anim" style="--delay: 0.6s">Logs</div>
                 <div class="videos">
-                    gimme a bit
+                    <div class="video anim" style="width: 203%;">
+                        <div style="text-decoration: none;color: #666eff;">
+                            <div class="video-by">Defender</div>
+                            <div class="video-name padding_stat_n" style="width: 99%;">
+                                <table>
+                                    {% for blue_log_now in blue_logs_list %}
+                                        <tr>
+                                            {% autoescape false %}
+                                                <td>{{ blue_log_now["timestamp"] }}</td>
+                                                <td style="color:white;font-size: 20px;">|</td>
+                                                <td style="color: white;font-weight: 700;word-break: break-all;">{{ blue_log_now["data"] }}</td>
+                                            {% endautoescape %}
+                                        </tr>
+                                    {% endfor %}
+
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="video anim" style="width: 0;"></div>
+                    <div class="video anim" style="width: 203%;">
+                        <div style="text-decoration: none;color: #ff6666;">
+                            <div class="video-by">Attacker</div>
+                            <div class="video-name padding_stat_n">
+                                <table>
+                                    {% for red_log_now in red_logs_list %}
+                                        <tr>
+                                            <td>{{ red_log_now["timestamp"] }}</td>
+                                            <td style="color:white;font-size: 20px;">|</td>
+                                            
+                                                <td style="color: white;font-weight: 700;">{{ red_log_now["data"] }}</td>
+                                            
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div><br>
             </div>
+            <script>
+                if("{{ sim_running }}" == "True"){
+                    console.log("1")
+                    document.getElementById("start_stop_sim_btn").innerHTML = "Stop Simulation"
+                } else {
+                    console.log("2")
+                    document.getElementById("start_stop_sim_btn").innerHTML = "Start Simulation"
+                }
+                document.getElementById("time_since_sim_start_min").innerHTML = {{sim_start_timestamp}} + " min"
+            </script>
         </div>
     </div>
 </body>
