@@ -14,8 +14,6 @@ from werkzeug.middleware.shared_data import SharedDataMiddleware
 from oauthlib.oauth2 import WebApplicationClient
 from discord_webhook import DiscordWebhook, DiscordEmbed
 
-contact_support_dc_webhook = ""
-
 app = Flask(__name__)
 
 app.config.update(
@@ -40,7 +38,6 @@ class User(UserMixin):
 def load_user(userid):
     return User(userid)
 
-
 def get_username(self):
     return self.username
 
@@ -48,7 +45,6 @@ def get_username(self):
 @app.route('/')
 def homepage():
     return redirect("/login")
-
 
 
 @app.route('/login', methods=['GET',"POST"])
@@ -112,18 +108,58 @@ def cpdashy_1_main():
             user_data = json.load(f)
 
         # Continue here -> log data reading
+        # start sim button
 
         return render_template("main/dashboard_main1.html",sidebar_html_insert=cpdash_get_sidebar().replace("active_state_class1","is-active"), profile_picture=user_data["picture"],profile_username=user_data["username"],profile_userid=user_data["userid"],profile_email=user_data["email"])
 
     else:
         return redirect('/login')
+    
+@app.route("/d1/startsim", methods=['GET']) #start the sim
+def cpdashy_startsim():
+    if current_user.is_authenticated:
+        clear_session_full()
+        with open("database/temp/attack_start.txt","w") as f:
+            f.write(str(time.time()))
+        return redirect("/d1")
+    else:
+        return redirect('/login')
+    
+
+# API
+def clear_session_full():
+    os.remove("database/temp/sim_start.txt")
+    os.remove("database/temp/attack_start.txt")
+    with open("database/logs/red.json","w") as f:
+        f.write("{}")
+    with open("database/logs/blue.json","w") as f:
+        f.write("{}")
+
+@app.route("/api/red", methods=['POST'])
+def api_red_logs():
+    temp_json_n = request.json
+    print("red log received")
+    print(temp_json_n)
+
+    if temp_json_n["title"] == "Start of attack":
+        with open("database/temp/attack_start.txt",'w') as f:
+            f.write(str(temp_json_n["timestamp"]))
+
+    with open("database/logs/red.json","r") as f:
+        logs_list = json.load(f)
+    logs_list.append(temp_json_n)
+    with open("database/logs/red.json","w") as f:
+        json.dump(logs_list)
+
+    return("log saved")
+
+
 
 
 # Error handling
 @app.errorhandler(401)
 def custom_401(error):
     return redirect("/")
-
 
 @app.errorhandler(404)
 def custom_404(error):
