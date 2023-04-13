@@ -74,15 +74,39 @@ def login_general():
             
             if not matching_user_json == None:
                 if matching_user_json["password"] == password_login:
+                    var_user_to_login = User(matching_user_json["id"])
+                    login_user(var_user_to_login)
                     return redirect("/d1")
                 else:
-                    return render_template("dashboard/login/invalid_credentials_noti.html")
+                    return render_template("login/invalid_credentials_noti.html")
             else:
-                return render_template("dashboard/login/invalid_credentials_noti.html")
+                return render_template("login/invalid_credentials_noti.html")
         else:
-            return render_template("dashboard/login/invalid_credentials_noti.html")
+            return render_template("login/invalid_credentials_noti.html")
     else:
-        return render_template("dashboard/login/main_login.html")
+        return render_template("login/main_login.html")
+
+
+# Main Dashboard start
+
+def cpdash_get_sidebar():
+    with open('templates/sidebar.html','r') as f:
+        sidebar = f.read()
+    return(sidebar)
+
+@app.route("/d1", methods=['GET']) #main manager dash
+def cpdashy_1_main():
+    if current_user.is_authenticated:
+        userid = str(current_user.name).replace("user","").replace("User","").replace("USER","")
+        with open(f'database/users/{userid}/user.json','r') as f:
+            user_data = json.load(f)
+
+        # Continue here -> log data reading
+
+        return render_template("main/dashboard_main1.html",sidebar_html_insert=cpdash_get_sidebar().replace("active_state_class1","is-active"), profile_picture=user_data["picture"],profile_username=user_data["username"],profile_userid=user_data["userid"],profile_email=user_data["email"])
+
+    else:
+        return redirect('/login')
 
 
 # Error handling
@@ -96,5 +120,4 @@ def custom_404(error):
     return redirect("/")
 
 if __name__ == '__main__':
-    app.run(host='185.78.255.231', threaded=True,use_reloader=True, port=443, 
-            ssl_context=('/etc/letsencrypt/live/cipherwatch.asdatindustries.com/fullchain.pem', '/etc/letsencrypt/live/cipherwatch.asdatindustries.com/privkey.pem'))
+    app.run(host='185.78.255.231', threaded=True,use_reloader=True, port=443, ssl_context=('/etc/letsencrypt/live/network.kyudev.xyz/fullchain.pem', '/etc/letsencrypt/live/network.kyudev.xyz/privkey.pem'))
