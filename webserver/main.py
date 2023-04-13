@@ -87,6 +87,16 @@ def login_general():
         return render_template("login/main_login.html")
 
 
+@app.route("/logout", methods=['GET']) #logout
+def cpdashy_logout_main():
+    try:
+        logout_user()
+    except:
+        pass #prolly not even logged in
+    return redirect("/login")
+
+
+
 # Main Dashboard start
 
 def cpdash_get_sidebar():
