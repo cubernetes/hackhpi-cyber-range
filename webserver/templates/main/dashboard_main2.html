@@ -1296,220 +1296,48 @@
                     width: 140px;
                 }
             </style>
-            <div class="main-container">
+            <div class="main-container" name="main_scroll_shit">
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-                <div class="main-header anim" style="--delay: 0.4s">General</div>
-                <div class="videos">
-                    <div class="video anim" style="--delay: .4s">
-                        <a href="#" style="text-decoration: none;color: #ff66d9;">
-                            <div class="video-by" title="Time elapsed since the Attack started">Time since Attack start</div>
-                            {% autoescape false %}
-                                <div class="video-name padding_stat_n">{{ attack_start_timestamp }}</div>
-                            {% endautoescape %}
-                        </a>
-                    </div>
-                    <div class="video anim" style="--delay: .45s">
-                        <a href="#" style="text-decoration: none;color: #ff66d9;">
-                            <div class="video-by" title="Time since the sim started">Time since Sim start</div>
-                            {% autoescape false %}
-                                <div class="video-name padding_stat_n">{{ sim_start_timestamp }}</div>
-                            {% endautoescape %}
-                        </a>
-                    </div>
-                    <div class="video anim" style="--delay: .5s">
-                        <a href="/d1/startsim" style="text-decoration: none;color: #ff66d9;">
-                            <div class="video-by" title="Start or Stop the Simulation" id="start_stop_sim_btn">Start Simulation</div>
-                            <div class="video-name padding_stat_n">click here</div>
-                        </a>
-                    </div>
-                    <div class="video anim" style="--delay: .55s">
-                        <a href="#" style="text-decoration: none;color: #ff66d9;">
-                            <div class="video-by" title="xxx">Other</div>
-                            <div class="video-name padding_stat_n">xxx</div>
-                        </a>
-                    </div>
-                </div><br><br><br>
-
-
-
                 <div class="main-header anim" style="--delay: 0.6s">Logs</div>
-
-                <!-- timeline css -->
-                <style>
-                    /* The actual timeline (the vertical ruler) */
-                    .timeline {
-                    position: relative;
-                    max-width: 950px;
-                    margin: 0 auto;
-                    }
-
-                    /* The actual timeline (the vertical ruler) */
-                    .timeline::after {
-                    content: '';
-                    position: absolute;
-                    width: 6px;
-                    background-color: #252936;
-                    top: 0;
-                    bottom: 0;
-                    left: 50%;
-                    margin-left: -3px;
-                    }
-
-                    /* Container around content */
-                    .container_time {
-                    padding: 10px 40px;
-                    position: relative;
-                    background-color: inherit;
-                    width: 50%;
-                    }
-
-                    /* The circles on the timeline */
-                    .container_time::after {
-                    content: '';
-                    position: absolute;
-                    width: 25px;
-                    height: 25px;
-                    right: -17px;
-                    background-color: #252936;
-                    border: 4px solid #fd3737;
-                    top: 15px;
-                    border-radius: 50%;
-                    z-index: 1;
-                    }
-
-                    .container_time_right {
-                    padding: 10px 40px;
-                    position: relative;
-                    background-color: inherit;
-                    width: 50%;
-                    }
-
-                    /* The circles on the timeline */
-                    .container_time_right::after {
-                    content: '';
-                    position: absolute;
-                    width: 25px;
-                    height: 25px;
-                    right: -17px;
-                    background-color: #252936;
-                    border: 4px solid #5590ff;
-                    top: 15px;
-                    border-radius: 50%;
-                    z-index: 1;
-                    }
-
-                    /* Place the container to the left */
-                    .left {
-                    left: 0;
-                    }
-
-                    /* Place the container to the right */
-                    .right {
-                    left: 50%;
-                    }
-
-                    /* Add arrows to the left container (pointing right) */
-                    .left::before {
-                    content: " ";
-                    height: 0;
-                    position: absolute;
-                    top: 22px;
-                    width: 0;
-                    z-index: 1;
-                    right: 30px;
-                    border: medium solid #252936;
-                    border-width: 10px 0 10px 10px;
-                    border-color: transparent transparent transparent #252936;
-                    }
-
-                    /* Add arrows to the right container (pointing left) */
-                    .right::before {
-                    content: " ";
-                    height: 0;
-                    position: absolute;
-                    top: 22px;
-                    width: 0;
-                    z-index: 1;
-                    left: 30px;
-                    border: medium solid #252936;
-                    border-width: 10px 10px 10px 0;
-                    border-color: transparent #252936 transparent transparent;
-                    }
-
-                    /* Fix the circle for containers on the right side */
-                    .right::after {
-                    left: -16px;
-                    }
-
-                    /* The actual content */
-                    .content_time {
-                    padding: 1px 15px;
-                    background-color: #252936;
-                    position: relative;
-                    word-break: break-all;
-                    border-radius: 6px;
-                    }
-
-                    /* Media queries - Responsive timeline on screens less than 600px wide */
-                    @media screen and (max-width: 600px) {
-                    /* Place the timelime to the left */
-                    .timeline::after {
-                        left: 31px;
-                    }
-
-                    /* Full-width containers */
-                    .container_time {
-                        width: 100%;
-                        padding-left: 70px;
-                        padding-right: 25px;
-                    }
-
-                    /* Make sure that all arrows are pointing leftwards */
-                    .container_time::before {
-                        left: 60px;
-                        border: medium solid #252936;
-                        border-width: 2px 2px 2px 0;
-                        border-color: transparent #252936 transparent transparent;
-                    }
-
-                    .container_time_right {
-                        width: 100%;
-                        padding-left: 70px;
-                        padding-right: 25px;
-                    }
-
-                    /* Make sure that all arrows are pointing leftwards */
-                    .container_time_right::before {
-                        left: 60px;
-                        border: medium solid #252936;
-                        border-width: 10px 10px 10px 0;
-                        border-color: transparent #252936 transparent transparent;
-                    }
-
-                    /* Make sure all circles are at the same spot */
-                    .left::after, .right::after {
-                        left: 15px;
-                    }
-
-                    /* Make all right containers behave like the left ones */
-                    .right {
-                        left: 0%;
-                    }
-                    }
-                </style>
-                <div>
-                    <div class="timeline">
-                        {% for blue_log_now in total_logs_list %}
-                            <div class='{{ blue_log_now["timeline_class"] }} {{ blue_log_now["timeline_side"] }}' style="box-sizing: border-box;">
-                                <div class="content_time" style="box-sizing: border-box;">
-                                    {% autoescape false %}
-                                        <h2>{{ blue_log_now["timestamp"] }}</h2>
-                                        <p>{{ blue_log_now["data"] }}</p>
-                                    {% endautoescape %}
-                                </div>
+                <div class="videos">
+                    <div class="video anim" style="width: 203%;">
+                        <div style="text-decoration: none;color: #ff6666;">
+                            <div class="video-by">Attacker</div>
+                            <div class="video-name padding_stat_n" style="width: 99%;">
+                                <table>
+                                    {% for red_log_now in red_logs_list %}
+                                        <tr>
+                                            {% autoescape false %}
+                                                <td>{{ red_log_now["timestamp"] }}</td>
+                                            {% endautoescape %}
+                                            <td style="color:white;font-size: 20px;">|</td>
+                                            <td style="color: white;font-weight: 700;">{{ red_log_now["data"] }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
                             </div>
-                        {% endfor %}
+                        </div>
+                    </div>
+                    <div class="video anim" style="width: 0;"></div>
+                    <div class="video anim" style="width: 203%;">
+                        <div style="text-decoration: none;color: #666eff;">
+                            <div class="video-by">Defender</div>
+                            <div class="video-name padding_stat_n">
+                                <table>
+                                    {% for blue_log_now in blue_logs_list %}
+                                        <tr>
+                                            {% autoescape false %}
+                                                <td>{{ blue_log_now["timestamp"] }}</td>
+                                                <td style="color:white;font-size: 20px;">|</td>
+                                                <td style="color: white;font-weight: 700;word-break: break-all;">{{ blue_log_now["data"] }}</td>
+                                            {% endautoescape %}
+                                        </tr>
+                                    {% endfor %}
+
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 

@@ -170,9 +170,80 @@ def cpdashy_1_main():
 
         blue_logs_list.reverse()
         red_logs_list.reverse()
-        total_logs_list.reverse()
+        # total_logs_list.reverse()
 
         return render_template("main/dashboard_main1.html",total_logs_list=total_logs_list,attack_start_timestamp=attack_start_timestamp,blue_logs_list=blue_logs_list,red_logs_list=red_logs_list,sim_running=sim_running,sim_start_timestamp=sim_start_timestamp,sidebar_html_insert=cpdash_get_sidebar().replace("active_state_class1","is-active"), profile_picture=user_data["picture"],profile_username=user_data["username"],profile_userid=user_data["userid"],profile_email=user_data["email"])
+    else:
+        return redirect('/login')
+    
+
+@app.route("/d2", methods=['GET']) #logs
+def cpdashy_2_main():
+    if current_user.is_authenticated:
+        userid = str(current_user.name).replace("user","").replace("User","").replace("USER","")
+        with open(f'database/users/{userid}/user.json','r') as f:
+            user_data = json.load(f)
+
+        if not os.path.exists("database/temp/sim_running.txt"):
+            sim_running = "False"
+        else:
+            with open("database/temp/sim_running.txt","r") as f:
+                sim_running = f.read()
+
+        if not os.path.exists("database/temp/sim_start.txt"):
+            sim_start_timestamp = "0"
+        else:
+            with open("database/temp/sim_start.txt","r") as f:
+                sim_start_timestamp_stamp = int(f.read().split(".")[0])
+            
+            min, sec = divmod(time.time() - int(sim_start_timestamp_stamp),60)
+            sim_start_timestamp = str(int(min)) + "m&nbsp;" + str(int(round(sec,0))) + "s"
+
+
+        if not os.path.exists("database/temp/attack_start.txt"):
+            attack_start_timestamp = "0"
+        else:
+            with open("database/temp/attack_start.txt","r") as f:
+                attack_start_timestamp = int(f.read().split(".")[0])
+            
+            min, sec = divmod(time.time() - int(attack_start_timestamp),60)
+            attack_start_timestamp = str(int(min)) + "m&nbsp;" + str(int(round(sec,0))) + "s"
+
+
+
+
+        with open("database/logs/blue.json","r") as f:
+            blue_logs_list_ori = json.load(f)
+        blue_logs_list = []
+        for blue_log_now in blue_logs_list_ori:
+            min, sec = divmod(time.time() - int(blue_log_now["timestamp"]),60)
+            blue_log_now["timestamp"] = str(int(min)) + "m&nbsp;" + str(int(round(sec,0))) + "s"
+            blue_log_now["origin"] = "blue"
+            blue_log_now["timeline_class"] = "container_time_right"
+            blue_log_now["timeline_side"] = "right"
+            blue_logs_list.append(blue_log_now)
+
+        with open("database/logs/red.json","r") as f:
+            red_logs_list_ori = json.load(f)
+        red_logs_list = []
+        for red_log_now in red_logs_list_ori:
+            min, sec = divmod(time.time() - int(red_log_now["timestamp"]),60)
+            red_log_now["timestamp"] = str(int(min)) + "m&nbsp;" + str(int(round(sec,0))) + "s"
+            red_log_now["origin"] = "red"
+            red_log_now["timeline_class"] = "container_time"
+            red_log_now["timeline_side"] = "left"
+            red_logs_list.append(red_log_now)
+
+        total_logs_list = []
+        total_logs_list.extend(blue_logs_list)
+        total_logs_list.extend(red_logs_list)
+        total_logs_list.sort(key=extract_time, reverse=True)
+
+        blue_logs_list.reverse()
+        red_logs_list.reverse()
+        total_logs_list.reverse()
+
+        return render_template("main/dashboard_main2.html",total_logs_list=total_logs_list,attack_start_timestamp=attack_start_timestamp,blue_logs_list=blue_logs_list,red_logs_list=red_logs_list,sim_running=sim_running,sim_start_timestamp=sim_start_timestamp,sidebar_html_insert=cpdash_get_sidebar().replace("active_state_class2","is-active"), profile_picture=user_data["picture"],profile_username=user_data["username"],profile_userid=user_data["userid"],profile_email=user_data["email"])
     else:
         return redirect('/login')
     
