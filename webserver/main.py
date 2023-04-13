@@ -50,6 +50,41 @@ def homepage():
     return redirect("/login")
 
 
+
+@app.route('/login', methods=['GET',"POST"])
+def login_general():
+    if request.method == "POST":
+        commit_proper = True
+        try:
+            username = request.form['username']
+            password_login = request.form['password_login']
+            if username == "" and password_login == "":
+                commit_proper = False
+        except:
+            commit_proper = False
+
+        if commit_proper:
+            all_user_files = os.listdir('database/users')
+            matching_user_json = None
+            for user_now in all_user_files:
+                with open(f'database/users/{user_now}/user.json','r') as user_file:
+                    user_json = json.load(user_file)
+                if user_json["username"] == username or str(user_json["email"]).lower() == username.lower():
+                    matching_user_json = user_json
+            
+            if not matching_user_json == None:
+                if matching_user_json["password"] == password_login:
+                    return redirect("/d1")
+                else:
+                    return render_template("dashboard/login/invalid_credentials_noti.html")
+            else:
+                return render_template("dashboard/login/invalid_credentials_noti.html")
+        else:
+            return render_template("dashboard/login/invalid_credentials_noti.html")
+    else:
+        return render_template("dashboard/login/main_login.html")
+
+
 # Error handling
 @app.errorhandler(401)
 def custom_401(error):
