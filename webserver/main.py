@@ -370,4 +370,4 @@ def custom_404(error):
 clear_session_full()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', threaded=True, use_reloader=True, port=8088)
+    app.run(host='185.78.255.231', threaded=True,use_reloader=True, port=443, ssl_context=('/etc/letsencrypt/live/network.kyudev.xyz/fullchain.pem', '/etc/letsencrypt/live/network.kyudev.xyz/privkey.pem'))
