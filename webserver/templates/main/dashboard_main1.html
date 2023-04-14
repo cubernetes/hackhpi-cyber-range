@@ -1626,7 +1626,7 @@
 			if (start === -1 || document.getElementById('start_stop_sim_btn').innerHTML === 'Start Simulation') {
 				document.getElementById("simstart").innerHTML = "0";
 			} else {
-				document.getElementById("simstart").innerHTML = end - start;
+				document.getElementById("simstart").innerHTML = to_min_s(end - start);
 				if (document.getElementById('start_stop_sim_btn').innerHTML === 'Start Simulation')
 				{
 					document.getElementById("simstart").setAttribute("data-start", "-1");
@@ -1639,7 +1639,7 @@
 			if (start === -1 || document.getElementById('start_stop_sim_btn').innerHTML === 'Start Simulation') {
 				document.getElementById("attackstart").innerHTML = "0";
 			} else {
-				document.getElementById("attackstart").innerHTML = end - start;
+				document.getElementById("attackstart").innerHTML = to_min_s(end - start);
 			}
 
 			fetch('/api/logs')
