@@ -310,6 +310,7 @@ def api_red_logs():
 def api_blue_logs():
     global STARTED
     temp_json_n = request.json
+    temp_json_n['data'] = b64decode(temp_json_n['data']).decode('utf-8')
     print('blue log received')
     print(temp_json_n)
 

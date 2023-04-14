@@ -1303,7 +1303,7 @@
                 <div class="videos">
                     <div class="video anim" style="--delay: .4s">
                         <a href="#" style="text-decoration: none;color: #ff66d9;">
-                            <div class="video-by" title="Time elapsed since the Attack started">Time since Attack start</div>
+				<div class="video-by" title="Time elapsed since the Attack started">Time elapsed since start of attack</div>
                             {% autoescape false %}
 			    <div class="video-name padding_stat_n" id="attackstart" data-start="{{ attack_start_timestamp }}">0</div>
                             {% endautoescape %}
@@ -1311,7 +1311,7 @@
                     </div>
                     <div class="video anim" style="--delay: .45s">
                         <a href="#" style="text-decoration: none;color: #ff66d9;">
-                            <div class="video-by" title="Time since the sim started">Time since Sim start</div>
+				<div class="video-by" title="Time since the sim started">Time elapsed since start of simulation</div>
                             {% autoescape false %}
 			    <div class="video-name padding_stat_n" id="simstart" data-start="{{ sim_start_timestamp }}">0</div>
                             {% endautoescape %}
@@ -1320,13 +1320,13 @@
                     <div class="video anim" style="--delay: .5s">
                         <a id="start_toggle" href="/d1/startsim" style="text-decoration: none;color: #ff66d9;">
                             <div class="video-by" title="Start or Stop the Simulation" id="start_stop_sim_btn">Start Simulation</div>
-                            <div class="video-name padding_stat_n">click here</div>
+                            <div class="video-name padding_stat_n">Click here</div>
                         </a>
                     </div>
                     <div class="video anim" style="--delay: .55s">
                         <a href="#" style="text-decoration: none;color: #ff66d9;">
-                            <div class="video-by" title="xxx">Other</div>
-                            <div class="video-name padding_stat_n">xxx</div>
+                            <div class="video-by" title="xxx">Blue team status</div>
+                            <div class="video-name padding_stat_n">👍</div>
                         </a>
                     </div>
                 </div><br><br><br>
@@ -1555,6 +1555,7 @@
 		}
 		function populateTimeline(data) {
 			data = flatten_dict(data);
+			data.sort(timestamp_sort);
 			let tl = document.getElementById('timeline');
 			tl.innerHTML = '';
 			data.forEach(data_entry => {
@@ -1598,7 +1599,7 @@
 		const iid = setInterval(() => {
 			let start = parseInt(document.getElementById("simstart").getAttribute("data-start"));
 			let end = ~~(Date.now()/1e3);
-			if (start === -1 && document.getElementById('start_stop_sim_btn').innerHTML === 'Start Simulation' && document.getElementById("attackstart").getAttribute("data-start") === "-1") {
+			if (start === -1 || document.getElementById('start_stop_sim_btn').innerHTML === 'Start Simulation' || document.getElementById("attackstart").getAttribute("data-start") === "-1") {
 				document.getElementById("simstart").innerHTML = "0";
 			} else {
 				document.getElementById("simstart").innerHTML = end - start;
@@ -1611,7 +1612,7 @@
 
 			start = parseInt(document.getElementById("attackstart").getAttribute("data-start"));
 			end = ~~(Date.now()/1e3);
-			if (start === -1) {
+			if (start === -1 || document.getElementById('start_stop_sim_btn').innerHTML === 'Start Simulation') {
 				document.getElementById("attackstart").innerHTML = "0";
 			} else {
 				document.getElementById("attackstart").innerHTML = end - start;
