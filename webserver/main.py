@@ -288,8 +288,11 @@ def api_get_logs():
 def api_red_logs():
     global STARTED
     temp_json_n = request.json
-    print('red log received')
-    print(temp_json_n)
+    if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
+        remote_addr = request.environ['REMOTE_ADDR']
+    else:
+        remote_addr = request.environ['HTTP_X_FORWARDED_FOR']
+    temp_json_n['data'] = remote_addr + ': ' + temp_json_n['data']
 
     if STARTED:
         if temp_json_n['data'].lower() == 'start of attack':
@@ -302,17 +305,15 @@ def api_red_logs():
         with open('./database/logs/red.json', 'w') as f:
             json.dump(logs_list, f, ensure_ascii=False)
 
-        return 'log saved'
+        return 'log saved\n'
     else:
-        return 'simulation not started'
+        return 'simulation not started\n'
 
 @app.route('/api/blue', methods=['POST'])
 def api_blue_logs():
     global STARTED
     temp_json_n = request.json
     temp_json_n['data'] = b64decode(temp_json_n['data']).decode('utf-8')
-    print('blue log received')
-    print(temp_json_n)
 
     if STARTED:
         with open('./database/logs/blue.json') as f:
@@ -321,9 +322,9 @@ def api_blue_logs():
         with open('./database/logs/blue.json', 'w') as f:
             json.dump(logs_list, f, ensure_ascii=False)
 
-        return 'log saved'
+        return 'log saved\n'
     else:
-        return 'simulation not started'
+        return 'simulation not started\n'
 
 # Error handling
 @app.errorhandler(401)
