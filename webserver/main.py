@@ -255,6 +255,40 @@ def cpdashy_startsim():
     else:
         return redirect('/login')
     
+
+@app.route("/d3", methods=['GET']) #victim specs
+def cpdashy_3_main():
+    if current_user.is_authenticated:
+        userid = str(current_user.name).replace("user","").replace("User","").replace("USER","")
+        with open(f'database/users/{userid}/user.json','r') as f:
+            user_data = json.load(f)
+
+        if not os.path.exists("database/temp/attack_start.txt"):
+            attack_start_timestamp = "0"
+        else:
+            with open("database/temp/attack_start.txt","r") as f:
+                attack_start_timestamp = int(f.read().split(".")[0])
+            
+            min, sec = divmod(time.time() - int(attack_start_timestamp),60)
+            attack_start_timestamp = str(int(min)) + "m&nbsp;" + str(int(round(sec,0))) + "s"
+
+        if attack_start_timestamp == "0":
+            reachable = "<b style='color: green'>True</b>"
+            cpu_percentage = random.choice(["7%","8%","9%","10%","11%"])
+            ram_percentage = random.choice(["7%","8%","9%","10%","11%"])
+            ports_open = ["80","443"]
+        else:
+            reachable = "<b style='color: green'>True</b>"
+            cpu_percentage = random.choice(["67%","48%","90%","17%","81%"])
+            ram_percentage = random.choice(["19%","8%","9%","10%","11%"])
+            ports_open = ["80","443"]
+
+
+
+        return render_template("main/dashboard_main3.html",reachable=reachable,cpu_percentage=cpu_percentage,ram_percentage=ram_percentage,ports_open=ports_open,attack_start_timestamp=attack_start_timestamp,sidebar_html_insert=cpdash_get_sidebar().replace("active_state_class3","is-active"), profile_picture=user_data["picture"],profile_username=user_data["username"],profile_userid=user_data["userid"],profile_email=user_data["email"])
+    else:
+        return redirect('/login')
+
 # API
 def clear_session_full():
     for file_now in ['./database/temp/sim_start.txt', './database/temp/attack_start.txt', './database/temp/sim_running.txt', './database/temp/attack_running.txt']:
