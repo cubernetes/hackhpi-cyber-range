@@ -8,6 +8,7 @@ from flask_login import current_user, login_user, LoginManager, UserMixin, login
 from flask_mobility import Mobility
 from flask_caching import Cache
 from flask_ipban import IpBan
+from fpdf import FPDF
 from device_detector import DeviceDetector
 from flask_sslify import SSLify
 from requests_oauthlib import OAuth2Session
@@ -288,6 +289,72 @@ def cpdashy_3_main():
         return render_template("main/dashboard_main3.html",reachable=reachable,cpu_percentage=cpu_percentage,ram_percentage=ram_percentage,ports_open=ports_open,attack_start_timestamp=attack_start_timestamp,sidebar_html_insert=cpdash_get_sidebar().replace("active_state_class3","is-active"), profile_picture=user_data["picture"],profile_username=user_data["username"],profile_userid=user_data["userid"],profile_email=user_data["email"])
     else:
         return redirect('/login')
+    
+
+def generate_proof_pdf():
+    with open('./database/logs/blue.json') as f:
+        blue_logs_list_ori = json.load(f)
+    blue_logs_list = []
+    for blue_log_now in blue_logs_list_ori:
+        blue_log_now['timestamp'] = datetime.datetime.fromtimestamp(int(blue_log_now['timestamp'])).strftime("%H:%M:%S")
+        blue_log_now['origin'] = 'blue'
+        blue_log_now['timeline_class'] = 'container_time_right'
+        blue_log_now['timeline_side'] = 'right'
+        blue_logs_list.append(blue_log_now)
+
+    with open('./database/logs/red.json') as f:
+        red_logs_list_ori = json.load(f)
+    red_logs_list = []
+    for red_log_now in red_logs_list_ori:
+        red_log_now['timestamp'] = datetime.datetime.fromtimestamp(int(red_log_now['timestamp'])).strftime("%H:%M:%S")
+        red_log_now['origin'] = 'red'
+        red_log_now['timeline_class'] = 'container_time'
+        red_log_now['timeline_side'] = 'left'
+        red_logs_list.append(red_log_now)
+
+    total_logs_list = []
+    total_logs_list.extend(blue_logs_list)
+    total_logs_list.extend(red_logs_list)
+    total_logs_list.sort(key=extract_time, reverse=True)
+
+    pdf = FPDF()
+    pdf.add_page()
+
+    pdf.image("static/icon/main_free.png", x=175, y=13, w=25, h=25, type='png', link='https://hackhpi.kyudev.xyz')
+
+    pdf.ln(h=8) #br
+    pdf.set_font("arial", size=28)
+    pdf.cell(0, 10, txt="CyberRange Export",  ln=1, align='L')
+    pdf.set_font("arial", size=12)
+    pdf.ln() #br
+    pdf.cell(0, 10, txt="Log export of ", ln=1, align='L')
+
+    pdf.set_font("arial", size=15, style="b")
+    pdf.cell(0, 8, txt=datetime.datetime.now().strftime("%d.%m.%Y, %H:%M:%S"), ln=2, align='L') #name_entered
+    pdf.set_font("arial", size=10)
+    pdf.cell(0, 0, txt="Employee 2982373", ln=0) #userid
+
+    pdf.ln() #br
+    pdf.ln(h=10) #br
+    pdf.set_font("arial", size=12)
+
+    for log_now in total_logs_list:
+        pdf.cell(0, 12, txt=f'{log_now["timestamp"]} | Attacker: {log_now["data"]}', ln=2, align='L')
+
+
+    pdf.output(f'database/pdfs/export.pdf')
+
+@app.route("/d4", methods=['GET']) #pdf
+def cpdashy_4_main():
+    if current_user.is_authenticated:
+        userid = str(current_user.name).replace("user","").replace("User","").replace("USER","")
+        with open(f'database/users/{userid}/user.json','r') as f:
+            user_data = json.load(f)
+
+        generate_proof_pdf()
+        return send_file(f'database/pdfs/export.pdf',as_attachment=True)
+    else:
+        return redirect('/login')
 
 # API
 def clear_session_full():
@@ -369,4 +436,5 @@ def custom_404(error):
 clear_session_full()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', threaded=True, use_reloader=True, port=8088)
+    # app.run(host='0.0.0.0', threaded=True, use_reloader=True, port=8088)
+    app.run(host='185.78.255.231', threaded=True,use_reloader=True, port=443, ssl_context=('/etc/letsencrypt/live/network.kyudev.xyz/fullchain.pem', '/etc/letsencrypt/live/network.kyudev.xyz/privkey.pem'))
