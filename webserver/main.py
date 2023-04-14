@@ -245,7 +245,6 @@ def cpdashy_startsim():
                     f.write(str(int(time.time())))
                 with open('./database/temp/sim_running.txt', 'w') as f:
                     f.write('True')
-            
         else:
             clear_session_full()
             with open('./database/temp/sim_start.txt', 'w') as f:
@@ -294,7 +293,7 @@ def api_red_logs():
     temp_json_n['data'] = remote_addr + ': ' + temp_json_n['data']
 
     if STARTED:
-        if temp_json_n['data'].lower() == 'start of attack':
+        if 'start of attack' in temp_json_n['data'].lower():
             with open('./database/temp/attack_start.txt', 'w') as f:
                 f.write(str(temp_json_n['timestamp']))
 

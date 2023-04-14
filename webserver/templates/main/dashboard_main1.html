@@ -1609,7 +1609,7 @@
 		const iid = setInterval(() => {
 			let start = parseInt(document.getElementById("simstart").getAttribute("data-start"));
 			let end = ~~(Date.now()/1e3);
-			if (start === -1 || document.getElementById('start_stop_sim_btn').innerHTML === 'Start Simulation' || document.getElementById("attackstart").getAttribute("data-start") === "-1") {
+			if (start === -1 || document.getElementById('start_stop_sim_btn').innerHTML === 'Start Simulation') {
 				document.getElementById("simstart").innerHTML = "0";
 			} else {
 				document.getElementById("simstart").innerHTML = end - start;
