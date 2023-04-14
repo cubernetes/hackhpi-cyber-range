@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os, datetime, requests, random, json, time, string
+import os, datetime, requests, random, json, time, string, re
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 from flask import Flask, request, render_template, redirect, send_file, url_for, jsonify, session, flash, after_this_request
@@ -339,7 +339,11 @@ def generate_proof_pdf():
     pdf.set_font("arial", size=12)
 
     for log_now in total_logs_list:
-        pdf.cell(0, 12, txt=f'{log_now["timestamp"]} | Attacker: {log_now["data"]}', ln=2, align='L')
+        data = re.sub('(<[a-z].*?>)|(</[a-z].*?>)', '', log_now["data"])
+        if log_now["origin"] == "red":
+            pdf.cell(0, 12, txt=f'{log_now["timestamp"]} | Attacker: {data}', ln=2, align='L')
+        else:
+            pdf.cell(0, 12, txt=f'{log_now["timestamp"]} | Defender: {data}', ln=2, align='L')
 
 
     pdf.output(f'database/pdfs/export.pdf')
@@ -436,5 +440,5 @@ def custom_404(error):
 clear_session_full()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', threaded=True, use_reloader=True, port=8088)
-    # app.run(host='185.78.255.231', threaded=True,use_reloader=True, port=443, ssl_context=('/etc/letsencrypt/live/network.kyudev.xyz/fullchain.pem', '/etc/letsencrypt/live/network.kyudev.xyz/privkey.pem'))
+    # app.run(host='0.0.0.0', threaded=True, use_reloader=True, port=8088)
+    app.run(host='185.78.255.231', threaded=True,use_reloader=True, port=443, ssl_context=('/etc/letsencrypt/live/network.kyudev.xyz/fullchain.pem', '/etc/letsencrypt/live/network.kyudev.xyz/privkey.pem'))
