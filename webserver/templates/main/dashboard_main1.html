@@ -1564,8 +1564,7 @@
 				timestamp_h2 = document.createElement('h2');
 				data_tag = document.createElement('p');
 				timestamp_txt = document.createTextNode(to_min_s(document.getElementById('simstart').getAttribute('data-start'), data_entry.timestamp));
-				data_txt = document.createTextNode(data_entry.data);
-				data_tag.appendChild(data_txt);
+				data_tag.innerHTML = data_entry.data;
 				timestamp_h2.appendChild(timestamp_txt);
 				container.appendChild(timestamp_h2);
 				container.appendChild(data_tag);

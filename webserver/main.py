@@ -15,7 +15,6 @@ from shutil import copyfile
 from werkzeug.middleware.shared_data import SharedDataMiddleware
 from oauthlib.oauth2 import WebApplicationClient
 from discord_webhook import DiscordWebhook, DiscordEmbed
-from base64 import b64decode
 
 STARTED = 0
 
@@ -313,7 +312,6 @@ def api_red_logs():
 def api_blue_logs():
     global STARTED
     temp_json_n = request.json
-    temp_json_n['data'] = b64decode(temp_json_n['data']).decode('utf-8')
 
     if STARTED:
         with open('./database/logs/blue.json') as f:
