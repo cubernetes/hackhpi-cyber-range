@@ -77,7 +77,7 @@
             overflow: hidden;
             width: 100%;
             border-radius: 20px;
-            font-size: 15px;
+            font-size: 12px;
             font-weight: 500;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
             position: relative;
@@ -1305,7 +1305,7 @@
                         <a href="#" style="text-decoration: none;color: #ff66d9;">
                             <div class="video-by" title="Time elapsed since the Attack started">Time since Attack start</div>
                             {% autoescape false %}
-                                <div class="video-name padding_stat_n">{{ attack_start_timestamp }}</div>
+			    <div class="video-name padding_stat_n" id="attackstart" data-start="{{ attack_start_timestamp }}">0</div>
                             {% endautoescape %}
                         </a>
                     </div>
@@ -1313,12 +1313,12 @@
                         <a href="#" style="text-decoration: none;color: #ff66d9;">
                             <div class="video-by" title="Time since the sim started">Time since Sim start</div>
                             {% autoescape false %}
-                                <div class="video-name padding_stat_n">{{ sim_start_timestamp }}</div>
+			    <div class="video-name padding_stat_n" id="simstart" data-start="{{ sim_start_timestamp }}">0</div>
                             {% endautoescape %}
                         </a>
                     </div>
                     <div class="video anim" style="--delay: .5s">
-                        <a href="/d1/startsim" style="text-decoration: none;color: #ff66d9;">
+                        <a id="start_toggle" href="/d1/startsim" style="text-decoration: none;color: #ff66d9;">
                             <div class="video-by" title="Start or Stop the Simulation" id="start_stop_sim_btn">Start Simulation</div>
                             <div class="video-name padding_stat_n">click here</div>
                         </a>
@@ -1499,21 +1499,93 @@
                     }
                 </style>
                 <div>
-                    <div class="timeline">
-                        {% for blue_log_now in total_logs_list %}
-                            <div class='{{ blue_log_now["timeline_class"] }} {{ blue_log_now["timeline_side"] }}' style="box-sizing: border-box;">
+                    <div id="timeline" class="timeline">
+		    <!--
+                        {% for log_entry in total_logs_list %}
+                            <div class='{{ log_entry["timeline_class"] }} {{ log_entry["timeline_side"] }}' style="box-sizing: border-box;">
                                 <div class="content_time" style="box-sizing: border-box;">
                                     {% autoescape false %}
-                                        <h2>{{ blue_log_now["timestamp"] }}</h2>
-                                        <p>{{ blue_log_now["data"] }}</p>
+                                        <h2>{{ log_entry["timestamp"] }}</h2>
+                                        <p>{{ log_entry["data"] }}</p>
                                     {% endautoescape %}
                                 </div>
                             </div>
                         {% endfor %}
+		    -->
                     </div>
                 </div>
                 
             </div>
+	<script>
+		function to_min_s(txt_timestamp_start, txt_timestamp_end) {
+			let delta = parseInt(txt_timestamp_end) - parseInt(txt_timestamp_start);
+			let quotient = Math.floor(delta / 60);
+			let remainder = delta % 60;
+			return `${quotient}m ${remainder}s`;
+		}
+
+		function timestamp_sort(x, y) {
+			if (parseInt(x.timestamp) < parseInt(y.timestamp)) {
+				return -1;
+			}
+			if (parseInt(x.timestamp) > parseInt(y.timestamp)) {
+				return 1;
+			}
+			return 0;
+		}
+
+		function flatten_dict(data) {
+			let res = [];
+			data.red.forEach(data_entry => {
+				res.push({
+				team: 'red',
+				data: data_entry.data,
+				timestamp: data_entry.timestamp
+				});
+			});
+			data.blue.forEach(data_entry => {
+				res.push({
+				team: 'blue',
+				data: data_entry.data,
+				timestamp: data_entry.timestamp
+				});
+			});
+			return res;
+
+		}
+		function populateTimeline(data) {
+			data = flatten_dict(data);
+			let tl = document.getElementById('timeline');
+			tl.innerHTML = '';
+			data.forEach(data_entry => {
+				entry_div = document.createElement('div');
+				container = document.createElement('div');
+				timestamp_h2 = document.createElement('h2');
+				data_tag = document.createElement('p');
+				timestamp_txt = document.createTextNode(to_min_s(document.getElementById('simstart').getAttribute('data-start'), data_entry.timestamp));
+				data_txt = document.createTextNode(data_entry.data);
+				data_tag.appendChild(data_txt);
+				timestamp_h2.appendChild(timestamp_txt);
+				container.appendChild(timestamp_h2);
+				container.appendChild(data_tag);
+				container.classList.add("content_time");
+				container.setAttribute("style", 'box-sizing: border-box;');
+				entry_div.appendChild(container);
+				if (data_entry.team === 'red') {
+					entry_div.classList.add("container_time");
+				} else {
+					entry_div.classList.add("container_time_right");
+				}
+				if (data_entry.team === 'red') {
+					entry_div.classList.add("left");
+				} else {
+					entry_div.classList.add("right");
+				}
+				entry_div.setAttribute("style", 'box-sizing: border-box;');
+				tl.appendChild(entry_div);
+			});
+		}
+	</script>
             <script>
                 if("{{ sim_running }}" == "True"){
                     console.log("1")
@@ -1522,6 +1594,33 @@
                     console.log("2")
                     document.getElementById("start_stop_sim_btn").innerHTML = "Start Simulation"
                 }
+
+		const iid = setInterval(() => {
+			let start = parseInt(document.getElementById("simstart").getAttribute("data-start"));
+			let end = ~~(Date.now()/1e3);
+			if (start === -1 && document.getElementById('start_stop_sim_btn').innerHTML === 'Start Simulation' && document.getElementById("attackstart").getAttribute("data-start") === "-1") {
+				document.getElementById("simstart").innerHTML = "0";
+			} else {
+				document.getElementById("simstart").innerHTML = end - start;
+				if (document.getElementById('start_stop_sim_btn').innerHTML === 'Start Simulation')
+				{
+					document.getElementById("simstart").setAttribute("data-start", "-1");
+					document.getElementById("simstart").innerHTML = "0";
+				}
+			}
+
+			start = parseInt(document.getElementById("attackstart").getAttribute("data-start"));
+			end = ~~(Date.now()/1e3);
+			if (start === -1) {
+				document.getElementById("attackstart").innerHTML = "0";
+			} else {
+				document.getElementById("attackstart").innerHTML = end - start;
+			}
+
+			fetch('/api/logs')
+			.then(resp => resp.json())
+			.then(populateTimeline);
+		}, 1000);
             </script>
         </div>
     </div>
