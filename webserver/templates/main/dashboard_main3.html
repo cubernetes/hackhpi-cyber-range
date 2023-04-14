@@ -1299,58 +1299,35 @@
             <div class="main-container" name="main_scroll_shit">
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-                <div class="main-header anim" style="--delay: 0.6s">Logs</div>
+                <div class="main-header anim" style="--delay: 0.6s">Victim Specs</div>
                 <div class="videos">
                     <div class="video anim" style="width: 203%;">
                         <div style="text-decoration: none;color: #ff6666;">
-                            <div class="video-by">Attacker</div>
-                            <div class="video-name padding_stat_n" style="width: 99%;">
-                                <table>
-                                    {% for red_log_now in red_logs_list %}
-                                        <tr>
-                                            {% autoescape false %}
-                                                <td>{{ red_log_now["timestamp"] }}</td>
-                                            {% endautoescape %}
-                                            <td style="color:white;font-size: 20px;">|</td>
-                                            <td style="color: white;font-weight: 700;">{{ red_log_now["data"] }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                </table>
-                            </div>
+                            <div class="video-by">Overview</div>
+                            {% autoescape false %}
+                                <div class="video-name padding_stat_n" style="width: 99%;">
+                                    Reachable: {{reachable}}<br>
+                                    CPU: {{cpu_percentage}}<br>
+                                    RAM: {{ram_percentage}}
+                                </div>
+                            {% endautoescape %}
+                            <br>
                         </div>
                     </div>
                     <div class="video anim" style="width: 0;"></div>
                     <div class="video anim" style="width: 203%;">
                         <div style="text-decoration: none;color: #666eff;">
-                            <div class="video-by">Defender</div>
+                            <div class="video-by">Ports</div>
                             <div class="video-name padding_stat_n">
-                                <table>
-                                    {% for blue_log_now in blue_logs_list %}
-                                        <tr>
-                                            {% autoescape false %}
-                                                <td>{{ blue_log_now["timestamp"] }}</td>
-                                                <td style="color:white;font-size: 20px;">|</td>
-                                                <td style="color: white;font-weight: 700;word-break: break-all;">{{ blue_log_now["data"] }}</td>
-                                            {% endautoescape %}
-                                        </tr>
-                                    {% endfor %}
-
-                                </table>
+                                {% for port_now in ports_open %}
+                                    {{port_now}}<br>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
                 </div>
                 
             </div>
-            <script>
-                if("{{ sim_running }}" == "True"){
-                    console.log("1")
-                    document.getElementById("start_stop_sim_btn").innerHTML = "Stop Simulation"
-                } else {
-                    console.log("2")
-                    document.getElementById("start_stop_sim_btn").innerHTML = "Start Simulation"
-                }
-            </script>
         </div>
     </div>
 </body>
