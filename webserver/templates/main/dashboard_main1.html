@@ -1326,7 +1326,7 @@
                     <div class="video anim" style="--delay: .55s">
                         <a href="#" style="text-decoration: none;color: #ff66d9;">
                             <div class="video-by" title="xxx">Blue team status</div>
-                            <div class="video-name padding_stat_n">👍</div>
+                            <div id="bluestatus" class="video-name padding_stat_n">👍</div>
                         </a>
                     </div>
                 </div><br><br><br>
@@ -1562,6 +1562,7 @@
 				let t = to_min_s(document.getElementById('attackstart').getAttribute('data-start'), blue[idx].timestamp);
 				if (parseInt(t.split('m')[0]) > 5) {
 					blue.splice(idx, 0, {data: `<b style='color: red'>Time to respond: ${t}</b>`, timestamp: parseInt(blue[idx].timestamp)})
+					document.getElementById("bluestatus").textContent = "👎";
 				}
 				else {
 					blue.splice(idx, 0, {data: `Time to respond: ${t}`, timestamp: parseInt(blue[idx].timestamp)})
@@ -1625,6 +1626,7 @@
 			let end = ~~(Date.now()/1e3);
 			if (start === -1 || document.getElementById('start_stop_sim_btn').innerHTML === 'Start Simulation') {
 				document.getElementById("simstart").innerHTML = "0";
+				document.getElementById("bluestatus").textContent = "👍";
 			} else {
 				document.getElementById("simstart").innerHTML = to_min_s(start, end);
 				if (document.getElementById('start_stop_sim_btn').innerHTML === 'Start Simulation')
