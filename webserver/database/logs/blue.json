@@ -1,1 +1,1 @@
-[{"data": "archtosu@172.23.7.203: x && ./blueteambot1.sh", "timestamp": "1681455007"}, {"data": "<b style='color: yellow'>Snort: Intrusion Detected! Blue team should now be aware</b>", "timestamp": "1681455010"}]
+[{"data": "<b style='color: yellow'>IDS: Malicious Activity was detected</b>", "timestamp": "1681456601"}, {"data": "<b style='color: red'>Malicious IP: 10.10.1.89</b>", "timestamp": "1681456601"}, {"data": "ssh", "timestamp": "1681460202"}]
