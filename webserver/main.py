@@ -328,7 +328,8 @@ def api_red_logs():
     temp_json_n['data'] = remote_addr + ': ' + temp_json_n['data']
 
     if STARTED:
-        if temp_json_n['data'].lower() == 'start of attack':
+        print(temp_json_n['data'])
+        if 'start of attack' in temp_json_n['data'].lower():
             with open('./database/temp/attack_start.txt', 'w') as f:
                 f.write(str(temp_json_n['timestamp']))
 

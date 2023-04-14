@@ -1553,7 +1553,18 @@
 			return res;
 
 		}
+		
+		function add_info(blue) {
+			blue.sort(timestamp_sort);
+			let blue_count = blue.length;
+			if (blue_count > 1 && document.getElementById('attackstart').getAttribute('data-start') !== '-1') {
+				let t = to_min_s(document.getElementById('attackstart').getAttribute('data-start'), blue[1].timestamp);
+				blue.splice(1, 0, {data: `Time to respond: ${t}`, timestamp: parseInt(blue[1].timestamp)})
+			}
+		}
+
 		function populateTimeline(data) {
+			add_info(data.blue);
 			data = flatten_dict(data);
 			data.sort(timestamp_sort);
 			let tl = document.getElementById('timeline');
@@ -1561,13 +1572,13 @@
 			data.forEach(data_entry => {
 				entry_div = document.createElement('div');
 				container = document.createElement('div');
-				timestamp_h2 = document.createElement('h2');
-				data_tag = document.createElement('p');
+				data_h2 = document.createElement('h2');
+				timestamp_tag = document.createElement('p');
 				timestamp_txt = document.createTextNode(to_min_s(document.getElementById('simstart').getAttribute('data-start'), data_entry.timestamp));
-				data_tag.innerHTML = data_entry.data;
-				timestamp_h2.appendChild(timestamp_txt);
-				container.appendChild(timestamp_h2);
-				container.appendChild(data_tag);
+				timestamp_tag.appendChild(timestamp_txt);
+				data_h2.innerHTML = data_entry.data;
+				container.appendChild(data_h2);
+				container.appendChild(timestamp_tag);
 				container.classList.add("content_time");
 				container.setAttribute("style", 'box-sizing: border-box;');
 				entry_div.appendChild(container);
