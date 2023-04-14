@@ -387,6 +387,10 @@ def api_get_logs():
     }
     return json.dumps(result, ensure_ascii=False)
 
+def datas(logs):
+    for log in logs:
+        yield log['data']
+
 @app.route('/api/red', methods=['POST'])
 def api_red_logs():
     global STARTED
@@ -404,7 +408,8 @@ def api_red_logs():
 
         with open('./database/logs/red.json') as f:
             logs_list = json.load(f)
-        logs_list.append(temp_json_n)
+        if temp_json_n['data'] not in datas(logs_list):
+            logs_list.append(temp_json_n)
         with open('./database/logs/red.json', 'w') as f:
             json.dump(logs_list, f, ensure_ascii=False)
 
